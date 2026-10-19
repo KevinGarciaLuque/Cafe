@@ -6,6 +6,7 @@
   var SRC = '../src/content/siteContent.json';
   var DRAFT_KEY = 'aureo-admin-draft-v1';
   var original = null, content = null, dirty = false, previewTimer = null;
+  var mode = 'local', csrf = '', sha = '', canPublish = false;   /* local: exportar JSON. server: iniciar sesion y publicar */
 
   var $ = function (id) { return document.getElementById(id); };
   function el(tag, attrs, kids) {
@@ -82,7 +83,7 @@
   }
 
   /* ---------- estado, borrador y vista previa ---------- */
-  function setStatus(msg, isDirty) { var s = $('status'); s.textContent = msg; s.classList.toggle('dirty', !!isDirty); }
+  function setStatus(msg, isDirty) { var s = $('status'); s.textContent = msg; s.classList.remove('ok'); s.classList.toggle('dirty', !!isDirty); }
   function embeddedImages() { return (JSON.stringify(content).match(/"data:image\//g) || []).length; }
   function markDirty() {
     dirty = true;
@@ -142,8 +143,16 @@
       pickBtn.addEventListener('click', function () { file.click(); });
       t.addEventListener('input', function () { onChange(path, t.value.trim()); setThumb(t.value.trim()); });
       file.addEventListener('change', function () {
-        if (!file.files[0]) return;
-        shrinkImage(file.files[0], function (dataUrl) { t.value = '(imagen incrustada)'; t.readOnly = true; onChange(path, dataUrl); setThumb(dataUrl); });
+        var f = file.files[0];
+        if (!f) return;
+        shrinkImage(f, function (dataUrl) {
+          if (mode === 'server' && canPublish) {
+            /* modo servidor: la imagen se sube a GitHub y en el contenido queda solo su ruta */
+            setStatus('Subiendo imagen…', true); setThumb(dataUrl);
+            api('POST', 'image', { name: f.name, dataUrl: dataUrl }).then(function (r) { t.value = r.path; t.readOnly = false; onChange(path, r.path); setStatus('Imagen subida. Se publicará con el contenido.', true); })
+              .catch(function (e) { setStatus('No se subió la imagen: ' + e.message, true); });
+          } else { t.value = '(imagen incrustada)'; t.readOnly = true; onChange(path, dataUrl); setThumb(dataUrl); }
+        });
       });
       setThumb(value);
       col.appendChild(t); col.appendChild(pickBtn); col.appendChild(file);
@@ -282,7 +291,7 @@
     content = obj; buildPanels((document.querySelector('.tab[aria-selected="true"]') || { id: 'tab-general' }).id.replace('tab-', ''));
     $('siteName').textContent = content.brand.name; setStatus(msg, isDirty); dirty = !!isDirty; sendPreview();
   }
-  function init() {
+  function initLocal() {
     fetch(SRC, { cache: 'no-cache' }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (j) {
       original = j;
       var draft = null;
@@ -326,5 +335,72 @@
   });
   window.addEventListener('beforeunload', function (e) { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
 
+  /* ---------- modo servidor: sesion y publicacion ---------- */
+  function api(method, path, body) {
+    var opt = { method: method, credentials: 'same-origin', headers: {} };
+    if (body !== undefined) { opt.headers['Content-Type'] = 'application/json'; opt.body = JSON.stringify(body); }
+    if (csrf) opt.headers['X-CSRF-Token'] = csrf;
+    return fetch('/api/admin/' + path, opt).then(function (r) {
+      return r.json().catch(function () { return {}; }).then(function (j) {
+        if (r.status === 401 && path !== 'login') showLogin('Tu sesión terminó. Entra de nuevo.');
+        if (!r.ok) { var e = new Error(j.error || ('Error ' + r.status)); e.status = r.status; e.details = j.details; throw e; }
+        return j;
+      });
+    });
+  }
+  function showLogin(msg) {
+    $('login').hidden = false; $('loginErr').textContent = msg || '';
+    setTimeout(function () { ($('userField').hidden ? $('loginPass') : $('loginUser')).focus(); }, 30);
+  }
+  function setNotice(strong, rest) {
+    var n = $('notice'); n.textContent = '';
+    var b = document.createElement('strong'); b.textContent = strong + ' '; n.appendChild(b); n.appendChild(document.createTextNode(rest));
+  }
+  function enterServerMode(st) {
+    mode = 'server'; canPublish = !!st.publish; csrf = st.csrf || csrf;
+    $('btnPublish').hidden = !canPublish; $('btnLogout').hidden = false; $('btnDraft').hidden = true;
+    if (canPublish) setNotice('Modo administración.', 'Publicar guarda un commit en GitHub y Railway tarda 1 a 2 minutos en mostrar los cambios. Exportar sigue disponible como copia de seguridad.');
+    else setNotice('Publicación no configurada.', 'Faltan GITHUB_TOKEN o GITHUB_REPO en el servidor. Puedes editar y exportar el JSON, pero no publicar desde aquí.');
+  }
+  function loadServer() {
+    return api('GET', 'content').then(function (r) {
+      original = clone(r.content); sha = r.sha;
+      load(clone(r.content), 'Contenido publicado cargado. Sin cambios.', false);
+    }).catch(function (e) { if (e.status !== 401) setStatus('No se pudo cargar el contenido: ' + e.message, true); });
+  }
+  $('loginForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var b = $('loginBtn'); b.disabled = true; $('loginErr').textContent = '';
+    api('POST', 'login', { user: $('loginUser').value, password: $('loginPass').value })
+      .then(function (r) { csrf = r.csrf; $('loginPass').value = ''; $('login').hidden = true; return api('GET', 'status'); })
+      .then(function (st) { enterServerMode(st); return canPublish ? loadServer() : initLocal(); })
+      .catch(function (err) { $('loginErr').textContent = err.message; })
+      .then(function () { b.disabled = false; });
+  });
+  $('btnPublish').addEventListener('click', function () {
+    if (!window.confirm('Se publicará el contenido en la web. Railway tardará 1 a 2 minutos en mostrar los cambios. ¿Continuar?')) return;
+    var btn = this; btn.disabled = true; setStatus('Publicando…', true);
+    api('PUT', 'content', { content: content, sha: sha })
+      .then(function (r) { sha = r.sha; original = clone(content); dirty = false; setStatus('Publicado. Railway tarda 1 a 2 minutos en mostrarlo.', false); $('status').classList.add('ok'); })
+      .catch(function (e) { setStatus('No se publicó: ' + e.message + (e.details ? ' (' + e.details.join('; ') + ')' : ''), true); })
+      .then(function () { btn.disabled = false; });
+  });
+  $('btnLogout').addEventListener('click', function () {
+    if (dirty && !window.confirm('Hay cambios sin publicar. Si sales, se pierden. ¿Salir?')) return;
+    dirty = false;
+    api('POST', 'logout', {}).catch(function () {}).then(function () { location.reload(); });
+  });
+
+  function init() {
+    fetch('/api/admin/status', { credentials: 'same-origin', cache: 'no-store' })
+      .then(function (r) { if (!r.ok) throw new Error('sin api'); return r.json(); })
+      .then(function (st) {
+        if (!st.enabled) return initLocal();
+        $('userField').hidden = !st.needsUser;
+        if (st.authenticated) { enterServerMode(st); return canPublish ? loadServer() : initLocal(); }
+        showLogin('');
+      })
+      .catch(function () { initLocal(); });   /* servidor estatico sin API: Modalidad A */
+  }
   init();
 })();

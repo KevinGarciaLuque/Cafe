@@ -1,36 +1,47 @@
-# Administración real (Modalidad B): arquitectura recomendada
+# Administración real (Modalidad B)
 
-El panel de `site/admin/` (Modalidad A) edita el JSON en el navegador y no publica nada. Para que los cambios se publiquen de verdad hace falta autenticación y almacenamiento persistente.
+El panel `site/admin/` tiene dos modos. El servidor decide cuál usar:
 
-## Recomendación: CMS basado en Git sobre el mismo JSON
+- **Local (Modalidad A):** sin variables, en tu computadora. Edita el JSON en el navegador y se exporta. No publica.
+- **Con contraseña (Modalidad B):** con `ADMIN_PASSWORD`. Pide inicio de sesión y **Publicar** guarda un commit en GitHub.
 
-- **Qué es:** Decap CMS (o Sveltia CMS) se sirve como una página más en `/admin` y edita `src/content/siteContent.json` directamente en el repositorio de GitHub. Cada "Guardar y publicar" es un commit; el hosting reconstruye y publica.
-- **Autenticación:** inicio de sesión con GitHub (OAuth). Solo entran las personas con acceso de escritura al repositorio.
-- **Persistencia:** el propio repositorio. Historial completo, se puede deshacer cualquier cambio.
-- **Imágenes:** se suben al repositorio (`site/assets/img`) desde el panel.
-- **Costo:** cero en el plan gratuito de Netlify o Cloudflare Pages más una cuenta de GitHub.
-- **Por qué encaja:** el sitio ya es estático y todo el contenido ya está en un JSON. No hay base de datos que mantener ni servidor que proteger.
+## Cómo funciona
 
-## Qué se aparta del stack del skill
+```
+Navegador (panel)  --usuario y contraseña-->  tools/serve.mjs (Railway)
+                   <--cookie de sesion-----
+Publicar  -->  PUT /api/admin/content  -->  API de GitHub (Contents)  -->  commit en main
+                                                                              |
+                                                          Railway detecta el push y redespliega (1 a 2 min)
+```
 
-1. **Despliegue:** el skill despliega a Hostinger con un zip. Esta arquitectura necesita un hosting con pipeline desde Git (Netlify, Cloudflare Pages o GitHub Pages con OAuth propio).
-2. **Un solo `index.html` sin build:** el sitio sigue sin build. Solo se añade la carpeta `admin/` con el CMS y un `config.yml` que describe los campos del JSON.
-3. **El panel actual** (`site/admin/`) se reemplazaría por el CMS, o se conservaría como editor local.
+- El contenido se lee **desde GitHub**, no del disco del servidor, para no editar una versión vieja mientras Railway aún redespliega.
+- El almacenamiento persistente es el propio repositorio: historial completo y cualquier cambio se puede deshacer con `git revert`.
+- Las imágenes se suben a `site/assets/img/uploads/` y en el contenido queda solo su ruta. Se ven en la vista previa de inmediato y en el sitio tras el redespliegue.
 
-## Pasos de implantación (cuando se apruebe)
+## Variables (Railway, nunca en el código)
 
-1. Crear el repositorio y subir el contenido de `site/`.
-2. Conectar el repositorio a Netlify o Cloudflare Pages.
-3. Añadir `admin/config.yml` con los campos de `siteContent.json` y activar el backend de GitHub.
-4. Registrar la aplicación OAuth de GitHub y probar el inicio de sesión.
-5. Probar un cambio de punta a punta: editar un precio, guardar, ver el commit y verificar el sitio publicado.
+`ADMIN_USER`, `ADMIN_PASSWORD`, `GITHUB_TOKEN`, `GITHUB_REPO`, opcional `GITHUB_BRANCH`. Los pasos para crear el token están en el README.
+
+## Seguridad implementada
+
+- Contraseña y usuario comparados en tiempo constante, sin revelar cuál falló.
+- Máximo 5 intentos fallidos por dirección cada 15 minutos, y 30 en total. Después responde 429.
+- Cookie de sesión `HttpOnly`, `SameSite=Strict` y `Secure`; dura 8 horas. Las sesiones viven en memoria: reiniciar el servidor cierra todas.
+- Todo lo que cambia algo exige la cabecera `Origin` del mismo sitio y un token CSRF por sesión.
+- El servidor **valida el contenido** antes de publicar: estructura, 4 textos de hero, colores hexadecimales, límites de cantidad y tamaño, y rechaza enlaces `javascript:` y `data:`.
+- Imágenes: solo JPG, PNG y WebP, hasta 3.5 MB, y se comprueba que el contenido sea realmente una imagen (no basta la extensión). Se rechaza SVG.
+- El token de GitHub vive solo en el servidor y nunca llega al navegador.
+- Si dos personas publican a la vez, la segunda recibe un aviso de conflicto en lugar de pisar el cambio de la primera.
+
+## Límites que conviene conocer
+
+- Un solo administrador (un usuario y una contraseña). No hay roles ni registro de quién cambió qué, aparte del historial de commits.
+- Publicar tarda 1 a 2 minutos en verse, porque Railway redespliega.
+- El token de GitHub caduca. Al vencer, **Publicar** responde un error de GitHub; se crea otro y se actualiza la variable.
+- Las sesiones y el contador de intentos se pierden al reiniciar el servidor.
+- Los textos de los 4 momentos del recorrido, las 5 etapas, la galería de 5 imágenes y los pasos del proceso tienen cantidad fija: la fija el video y el diseño.
 
 ## Cuándo pasar a base de datos y backend propio
 
-Solo si aparecen pedidos, usuarios, inventario o varios editores con permisos distintos. Entonces conviene Supabase (autenticación y base de datos gestionadas) con el JSON como contenido base. Hasta entonces sería complejidad sin beneficio.
-
-## Seguridad mínima, en cualquier modalidad
-
-- No publicar `site/admin/` sin autenticación.
-- El contenido se pinta con `textContent` y los enlaces `javascript:` y `data:` se neutralizan (ya implementado en `content.js`).
-- Los mensajes del formulario deben ir a un servicio con protección contra spam; el formulario ya incluye un campo trampa para bots.
+Solo si aparecen pedidos, usuarios, inventario o varios editores con permisos distintos. Entonces conviene Supabase (autenticación y base de datos gestionadas) con este JSON como contenido base.

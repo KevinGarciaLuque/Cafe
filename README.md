@@ -42,9 +42,23 @@ Todo texto vive en `site/src/content/siteContent.json`: marca, hero, productos, 
 
 **No publica nada.** Los cambios viven en el navegador hasta que pulses *Exportar* y reemplaces `site/src/content/siteContent.json`. No tiene inicio de sesión, por eso `tools/package.ps1` no incluye `admin/` salvo que lo pidas.
 
-### Modalidad B: administración real (recomendada para producción)
+### Modalidad B: administración real (incluida, se activa con variables)
 
-Ver [docs/admin-real.md](docs/admin-real.md). Resumen: un CMS basado en Git sobre el mismo JSON, con inicio de sesión de GitHub y publicación por commit. Persistente y seguro, sin servidor propio.
+`/admin/` pide usuario y contraseña. **Publicar** guarda un commit en GitHub con el `siteContent.json` nuevo y Railway redespliega solo (1 a 2 minutos). Las imágenes se suben desde el panel al mismo repositorio. Detalles y seguridad en [docs/admin-real.md](docs/admin-real.md).
+
+Se activa en Railway, *Variables* (nunca en el código ni en GitHub):
+
+| Variable | Valor |
+|---|---|
+| `ADMIN_USER` | el usuario (por ejemplo un correo) |
+| `ADMIN_PASSWORD` | la contraseña, de 12 caracteres o más |
+| `GITHUB_TOKEN` | token fino de GitHub, solo este repositorio, permiso *Contents: Read and write* |
+| `GITHUB_REPO` | `usuario/repositorio` |
+| `GITHUB_BRANCH` | opcional, `main` por defecto |
+
+Para crear el token: GitHub, *Settings*, *Developer settings*, *Personal access tokens*, *Fine-grained tokens*, *Generate new token*. En *Repository access* elige *Only select repositories* y marca este repositorio. En *Repository permissions* pon *Contents* en *Read and write*. Ponle una caducidad y anótala: al vencer hay que crear otro y actualizar la variable.
+
+Sin `ADMIN_PASSWORD`, en producción `/admin` no existe (404). Sin `GITHUB_TOKEN`, el panel deja iniciar sesión, editar y exportar, pero no publicar.
 
 ## Formulario de contacto
 
@@ -79,7 +93,7 @@ El repositorio ya está listo: `package.json` define `npm start`, que sirve `sit
 3. En *Settings*, *Networking*, pulsar *Generate Domain* para obtener la dirección pública.
 4. Cada `git push` a `main` vuelve a desplegar.
 
-En producción el servidor **no sirve `/admin`** (no tiene inicio de sesión). Solo se habilita con la variable `ADMIN_ENABLED=1`, y no es recomendable sin proteger.
+En producción `/admin` solo existe si defines `ADMIN_PASSWORD` (ver Modalidad B). Sin esa variable responde 404.
 
 Antes de compartir la dirección, reemplaza `og:image` y `og:url` en `site/index.html` (marcados con `DEPLOY STEP`) por la dirección pública absoluta y vuelve a subir.
 

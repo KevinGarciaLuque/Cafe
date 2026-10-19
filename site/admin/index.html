@@ -21,7 +21,9 @@
     <button class="btn" id="btnImport" type="button">Importar JSON</button>
     <button class="btn" id="btnReset" type="button">Restablecer</button>
     <button class="btn" id="btnDraft" type="button">Guardar borrador</button>
-    <button class="btn btn-primary" id="btnExport" type="button">Exportar siteContent.json</button>
+    <button class="btn" id="btnExport" type="button">Exportar siteContent.json</button>
+    <button class="btn btn-primary" id="btnPublish" type="button" hidden>Publicar</button>
+    <button class="btn" id="btnLogout" type="button" hidden>Cerrar sesión</button>
   </div>
   <input type="file" id="fileImport" accept="application/json,.json" hidden>
 </header>
@@ -50,6 +52,17 @@
     </div>
     <div class="preview-frame"><iframe id="frame" title="Vista previa de la web" src="../index.html?preview=1"></iframe></div>
   </section>
+</div>
+
+<div class="login" id="login" hidden>
+  <form class="login-card" id="loginForm" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+    <h2 id="loginTitle">Acceso de administrador</h2>
+    <p class="login-hint">Solo para quien administra el contenido de la web.</p>
+    <div class="field" id="userField"><label for="loginUser">Usuario</label><input id="loginUser" type="text" autocomplete="username" spellcheck="false" autocapitalize="off"></div>
+    <div class="field"><label for="loginPass">Contraseña</label><input id="loginPass" type="password" autocomplete="current-password" required></div>
+    <p class="login-err" id="loginErr" role="alert"></p>
+    <button class="btn btn-primary" id="loginBtn" type="submit">Entrar</button>
+  </form>
 </div>
 
 <script src="admin.js"></script>

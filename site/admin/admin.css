@@ -87,3 +87,16 @@ fieldset>legend{padding:0 8px;font:400 .68rem/1 var(--f-mono);letter-spacing:.16
 }
 @media (max-width:560px){.tabs{width:96px}.tab{padding:9px 8px;font-size:.64rem}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* ---------- inicio de sesion ---------- */
+.login{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(10,7,5,.94)}
+.login[hidden]{display:none}
+.login-card{width:min(420px,100%);padding:28px 26px 24px;border:1px solid var(--line-strong);border-radius:10px;background:var(--panel)}
+.login-card h2{margin:0 0 6px;font:500 1.7rem/1.1 var(--f-display)}
+.login-hint{margin:0 0 20px;color:var(--muted);font-size:.88rem}
+.login-err{min-height:1.4em;margin:0 0 12px;color:var(--danger);font-size:.88rem}
+.login-card .btn{width:100%;padding:12px 16px}
+.field input[type=password]{width:100%;padding:9px 11px;border:1px solid var(--line-strong);border-radius:6px;background:rgba(245,235,221,.04)}
+.field input[type=password]:focus{outline:none;border-color:var(--accent-2);box-shadow:0 0 0 3px rgba(215,174,114,.2)}
+.btn[hidden]{display:none}
+.top-status.ok{color:#9FD6B2}
