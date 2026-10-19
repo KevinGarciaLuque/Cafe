@@ -90,9 +90,11 @@ main:focus{outline:none}
 .hero-scrub{position:relative;height:1100vh}
 .stage{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;background:var(--canvas)}
 .poster,#heroVideo{position:absolute;inset:0;width:100%;height:100%}
-.poster{background:center/cover no-repeat}
+.poster{background:center/cover no-repeat;transition:opacity .7s var(--ease)}
 #heroVideo{object-fit:cover;opacity:0;transition:opacity .7s var(--ease);will-change:transform;transform:translateZ(0);pointer-events:none}
 .stage.video-ready #heroVideo{opacity:1}
+/* el poster solo sostiene la pantalla mientras el video baja: si siguiera debajo, se transparentaria en el desvanecido del movil */
+.stage.video-ready .poster{opacity:0}
 .stage.video-failed #heroVideo{display:none}
 .scrim{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 120% 90% at 50% 45%,rgba(12,8,6,0) 35%,rgba(12,8,6,.62) 100%)}
 .bands,.final-wrap{position:absolute;inset:0;pointer-events:none}
