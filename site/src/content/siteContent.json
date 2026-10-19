@@ -1,0 +1,422 @@
+{
+  "meta": {
+    "lang": "es",
+    "title": "AUREO COFFEE | Del origen a tu taza",
+    "description": "Sigue el recorrido del café, del grano a la taza, con una experiencia cinematográfica. AUREO COFFEE, el origen de tus mejores momentos.",
+    "themeColor": "#17110E"
+  },
+  "brand": {
+    "name": "AUREO COFFEE",
+    "short": "AUREO",
+    "tagline": "Del origen a tu taza."
+  },
+  "theme": {
+    "colors": {
+      "canvas": "#17110E",
+      "panel": "#221812",
+      "panel2": "#39251C",
+      "accent": "#C28A55",
+      "accentHover": "#D7AE72",
+      "textPrimary": "#F5EBDD",
+      "textSecondary": "#BFAE9A"
+    }
+  },
+  "nav": {
+    "links": [
+      {
+        "label": "Historia",
+        "href": "#historia"
+      },
+      {
+        "label": "Cafés",
+        "href": "#cafes"
+      },
+      {
+        "label": "Proceso",
+        "href": "#proceso"
+      },
+      {
+        "label": "Menú",
+        "href": "#menu"
+      },
+      {
+        "label": "Contacto",
+        "href": "#contacto"
+      }
+    ],
+    "cta": {
+      "label": "Descubre nuestro café",
+      "href": "#cafes"
+    },
+    "menuOpen": "Abrir menú",
+    "menuClose": "Cerrar menú",
+    "skip": "Saltar al contenido"
+  },
+  "hero": {
+    "loadingLabel": "Cargando la experiencia",
+    "scrollCue": "Desliza para comenzar",
+    "progressLabel": "Progreso de la experiencia",
+    "stages": [
+      "Origen",
+      "Molienda",
+      "Extracción",
+      "Taza",
+      "Experiencia"
+    ],
+    "media": {
+      "video": "assets/video/hero-scrub.mp4",
+      "videoBytes": 16202169,
+      "poster": "assets/img/hero-poster.jpg",
+      "staticImage": "assets/img/hero-static.jpg",
+      "staticAlt": "Taza blanca de cerámica con latte art de hojas, sobre un plato blanco con granos de café tostado"
+    },
+    "bands": [
+      {
+        "id": "origen",
+        "range": [
+          0,
+          0.17
+        ],
+        "entrance": "drift",
+        "align": "left",
+        "title": "Todo comienza con un grano.",
+        "text": "Seleccionamos cada origen para crear una experiencia extraordinaria."
+      },
+      {
+        "id": "molienda",
+        "range": [
+          0.21,
+          0.37
+        ],
+        "entrance": "depth",
+        "align": "right",
+        "title": "La precisión transforma el sabor.",
+        "text": "Cada molienda libera una historia de aromas.",
+        "scrim": 1.2
+      },
+      {
+        "id": "extraccion",
+        "range": [
+          0.41,
+          0.57
+        ],
+        "entrance": "blur",
+        "align": "left",
+        "title": "El arte está en cada gota.",
+        "text": "",
+        "scrim": 1.1
+      },
+      {
+        "id": "taza",
+        "range": [
+          0.61,
+          0.77
+        ],
+        "entrance": "rise",
+        "align": "left",
+        "title": "Un momento que merece disfrutarse.",
+        "text": "",
+        "scrim": 1.1
+      }
+    ],
+    "final": {
+      "range": [
+        0.82,
+        1
+      ],
+      "title": "AUREO COFFEE",
+      "subtitle": "El origen de tus mejores momentos.",
+      "primary": {
+        "label": "Descubre nuestro café",
+        "href": "#cafes"
+      },
+      "secondary": {
+        "label": "Explorar el menú",
+        "href": "#menu"
+      }
+    }
+  },
+  "story": {
+    "kicker": "Nuestra historia",
+    "title": "Un café se decide mucho antes de la taza.",
+    "paragraphs": [
+      "AUREO nació de una idea sencilla: el café sabe mejor cuando alguien cuidó cada paso. Elegir el grano, molerlo en el momento y extraerlo con paciencia.",
+      "No hacemos más ruido que el de la máquina. Preferimos que el aroma hable primero y que la taza haga el resto."
+    ],
+    "image": "assets/img/historia.jpg",
+    "imageAlt": "Granos de café verdes en un cucharón de madera junto a granos tostados, sobre una tela oscura",
+    "values": [
+      {
+        "title": "Origen",
+        "text": "Cada café indica de dónde viene y cómo se trabajó."
+      },
+      {
+        "title": "Oficio",
+        "text": "Moler al momento y extraer con calma, sin atajos."
+      },
+      {
+        "title": "Aroma",
+        "text": "Lo primero que se siente, y lo que se recuerda."
+      }
+    ]
+  },
+  "coffees": {
+    "kicker": "Nuestros cafés",
+    "title": "Elige tu manera de empezar.",
+    "intro": "Tres cafés para distintos momentos del día. Productos y precios de ejemplo, editables desde el panel.",
+    "cta": "Preguntar por este café",
+    "items": [
+      {
+        "name": "Casa Aureo",
+        "tag": "Mezcla de la casa",
+        "notes": "Cacao, caramelo y nuez tostada.",
+        "description": "Cuerpo redondo y final dulce. El café para todos los días.",
+        "price": "$12.00",
+        "unit": "250 g",
+        "image": "assets/img/producto-casa.jpg",
+        "imageAlt": "Granos de café tostado en un cuenco blanco de cerámica con un cucharón de latón"
+      },
+      {
+        "name": "Origen Único",
+        "tag": "Edición limitada",
+        "notes": "Frutos rojos, miel y acidez suave.",
+        "description": "Un solo origen, tueste medio, para tomar sin prisa.",
+        "price": "$16.00",
+        "unit": "250 g",
+        "image": "assets/img/producto-origen.jpg",
+        "imageAlt": "Café de filtro goteando desde un dripper blanco hacia una jarra de vidrio, con vapor"
+      },
+      {
+        "name": "Reserva Oscura",
+        "tag": "Tueste intenso",
+        "notes": "Chocolate amargo, especias y crema espesa.",
+        "description": "Intenso y con cuerpo, pensado para el espresso.",
+        "price": "$14.00",
+        "unit": "250 g",
+        "image": "assets/img/producto-reserva.jpg",
+        "imageAlt": "Taza blanca de espresso con crema espesa sobre un plato con tres granos tostados"
+      }
+    ]
+  },
+  "process": {
+    "kicker": "Nuestro proceso",
+    "title": "Del grano a la taza, en cuatro pasos.",
+    "intro": "Esto es lo que pasa entre el grano y tu primer sorbo.",
+    "steps": [
+      {
+        "number": "01",
+        "name": "Origen",
+        "text": "Seleccionamos el grano y lo tostamos con el perfil justo para cada café.",
+        "image": "assets/img/origen.jpg",
+        "alt": "Granos de café tostado cayendo"
+      },
+      {
+        "number": "02",
+        "name": "Molienda",
+        "text": "Molemos en el momento. El aroma se libera y no se pierde esperando.",
+        "image": "assets/img/molienda.jpg",
+        "alt": "Café molido cayendo en un portafiltro desde un molino de metal cepillado"
+      },
+      {
+        "number": "03",
+        "name": "Extracción",
+        "text": "Agua caliente, presión y tiempo. Un hilo continuo de espresso con crema.",
+        "image": "assets/img/extraccion.jpg",
+        "alt": "Espresso cayendo en una taza blanca desde un portafiltro"
+      },
+      {
+        "number": "04",
+        "name": "Taza",
+        "text": "Servimos en porcelana blanca, con el diseño en la superficie y los granos al lado.",
+        "image": "assets/img/taza.jpg",
+        "alt": "Taza blanca con latte art de hojas sobre un plato blanco"
+      }
+    ],
+    "interaction": {
+      "title": "Mantén pulsado para moler",
+      "hint": "Suelta antes de tiempo y el aroma baja. Manténlo y se abre.",
+      "button": "Mantén para moler",
+      "done": "Listo. Estas son las notas de este café.",
+      "notes": [
+        "Cacao",
+        "Caramelo",
+        "Nuez tostada",
+        "Crema espesa"
+      ]
+    }
+  },
+  "experience": {
+    "kicker": "Experiencia",
+    "title": "Lo que se ve, se huele y se escucha.",
+    "intro": "Máquinas, granos y luz cálida. Las imágenes de esta web son generadas con IA.",
+    "gallery": [
+      {
+        "src": "assets/img/maquina.jpg",
+        "alt": "Máquina de espresso de acero cepillado con un portafiltro sobre una taza blanca",
+        "caption": "La máquina"
+      },
+      {
+        "src": "assets/img/molido.jpg",
+        "alt": "Montículo de café recién molido en el canasto de un portafiltro",
+        "caption": "Recién molido"
+      },
+      {
+        "src": "assets/img/cenital.jpg",
+        "alt": "Vista desde arriba de una taza blanca con latte art de hojas, sobre un plato con granos de café",
+        "caption": "Vista cenital"
+      },
+      {
+        "src": "assets/img/extraccion.jpg",
+        "alt": "Hilos de espresso cayendo en una taza blanca",
+        "caption": "La extracción"
+      },
+      {
+        "src": "assets/img/taza.jpg",
+        "alt": "Taza blanca con latte art de hojas y granos de café sobre el plato",
+        "caption": "La taza"
+      }
+    ]
+  },
+  "menu": {
+    "kicker": "Menú",
+    "title": "Para pedir con calma.",
+    "intro": "Bebidas y precios de ejemplo, editables desde el panel.",
+    "categories": [
+      {
+        "name": "Espresso",
+        "items": [
+          {
+            "name": "Espresso",
+            "description": "Doble, con crema dorada.",
+            "price": "$3.00"
+          },
+          {
+            "name": "Americano",
+            "description": "Espresso largo con agua caliente.",
+            "price": "$3.50"
+          },
+          {
+            "name": "Cortado",
+            "description": "Espresso con un poco de leche texturizada.",
+            "price": "$3.80"
+          }
+        ]
+      },
+      {
+        "name": "Con leche",
+        "items": [
+          {
+            "name": "Latte",
+            "description": "Suave, con diseño en la superficie.",
+            "price": "$4.50"
+          },
+          {
+            "name": "Cappuccino",
+            "description": "Espuma densa y café intenso.",
+            "price": "$4.50"
+          },
+          {
+            "name": "Flat white",
+            "description": "Más café, menos espuma.",
+            "price": "$4.80"
+          }
+        ]
+      },
+      {
+        "name": "Para llevar a casa",
+        "items": [
+          {
+            "name": "Grano entero",
+            "description": "250 g, del café que elijas.",
+            "price": "$12.00"
+          },
+          {
+            "name": "Molido a la medida",
+            "description": "Dinos tu cafetera y lo molemos.",
+            "price": "$12.00"
+          }
+        ]
+      }
+    ]
+  },
+  "contact": {
+    "kicker": "Contacto",
+    "title": "Hablemos de café.",
+    "intro": "Escríbenos para pedidos, dudas o para saber cuál café va contigo.",
+    "email": "",
+    "whatsapp": "",
+    "whatsappLabel": "Escribir por WhatsApp",
+    "whatsappMessage": "Hola, quiero saber más sobre AUREO COFFEE.",
+    "address": "",
+    "hours": "",
+    "socials": [],
+    "labels": {
+      "address": "Dirección",
+      "hours": "Horario",
+      "email": "Correo",
+      "social": "Redes"
+    },
+    "formEndpoint": "",
+    "form": {
+      "name": "Nombre",
+      "namePlaceholder": "Tu nombre",
+      "email": "Correo",
+      "emailPlaceholder": "tucorreo@ejemplo.com",
+      "message": "Mensaje",
+      "messagePlaceholder": "Cuéntanos qué necesitas",
+      "submit": "Enviar mensaje",
+      "sending": "Enviando",
+      "success": "Gracias. Recibimos tu mensaje.",
+      "successDemo": "Gracias. Este formulario es de demostración y el mensaje no se envió a ningún lugar.",
+      "successMailto": "Se abrió tu aplicación de correo para enviar el mensaje.",
+      "error": "No pudimos enviar el mensaje. Inténtalo de nuevo en un momento.",
+      "required": "Completa este campo",
+      "invalidEmail": "Escribe un correo válido"
+    }
+  },
+  "faq": {
+    "kicker": "Preguntas frecuentes",
+    "title": "Lo que más nos preguntan.",
+    "items": [
+      {
+        "q": "¿Cómo sé que el café está fresco?",
+        "a": "Cada paquete lleva su fecha de tueste. Y si lo pides molido, lo molemos en el momento para que no pierda aroma."
+      },
+      {
+        "q": "¿Por qué mi café sabe amargo?",
+        "a": "Casi siempre es la molienda o el tiempo de extracción. Cuéntanos tu cafetera y te ayudamos a ajustarlos."
+      },
+      {
+        "q": "¿De dónde viene el café?",
+        "a": "Cada café indica su origen en la etiqueta. Si algo no queda claro, pregúntanos."
+      },
+      {
+        "q": "¿Pueden moler el café para mi cafetera?",
+        "a": "Sí. Dinos qué método usas y lo molemos a la medida."
+      }
+    ]
+  },
+  "footer": {
+    "text": "El origen de tus mejores momentos.",
+    "disclosure": "AUREO COFFEE es una marca ficticia. Las imágenes fueron generadas con IA. Productos y precios son de ejemplo.",
+    "copyright": "© AUREO COFFEE",
+    "links": [
+      {
+        "label": "Historia",
+        "href": "#historia"
+      },
+      {
+        "label": "Cafés",
+        "href": "#cafes"
+      },
+      {
+        "label": "Menú",
+        "href": "#menu"
+      },
+      {
+        "label": "Contacto",
+        "href": "#contacto"
+      }
+    ]
+  }
+}

@@ -1,0 +1,10 @@
+# Material pesado y de trabajo: nunca se publica ni se versiona
+source/
+review/
+dist/
+*.zip
+node_modules/
+
+# Material de referencia que la web no usa
+10k-websites/
+imagenes/
