@@ -62,7 +62,13 @@ Actualiza `hero.media.videoBytes` y revisa los rangos de `hero.bands` (progreso 
 
 ## Comportamiento por dispositivo
 
-Escritorio: scrub completo. Teléfonos, tablets verticales, teléfonos en horizontal y usuarios con movimiento reducido: imagen estática diseñada, sin descargar video ni póster. Las 5 condiciones son idénticas en `main.css` y `hero.js` y se reevalúan en vivo al girar, redimensionar o cambiar la preferencia.
+- **Escritorio y tablets horizontales:** scrub con `hero-scrub.mp4` (16:9, 16 MB).
+- **Teléfonos y tablets verticales:** scrub con `hero-scrub-m.mp4` (4:5, 5.7 MB). Es el mismo recorrido recortado con una ventana que sigue al sujeto en cada escena. El video va arriba y el texto debajo.
+- **Imagen estática diseñada, sin descargar video:** teléfono en horizontal, movimiento reducido, ahorro de datos del navegador, y como respaldo si el video no carga en el móvil.
+
+Las condiciones son idénticas en `main.css` y `hero.js` (`STATIC_GATES` y `MOBILE_GATES`) y se reevalúan en vivo al girar, redimensionar o cambiar la preferencia.
+
+Para regenerar el video móvil a partir de uno nuevo, el recorte sigue una curva de posición por tiempo; ver el comando `crop=` usado en el historial del proyecto (`source/crop-expr.txt` guarda la expresión).
 
 ## Publicar en Railway
 

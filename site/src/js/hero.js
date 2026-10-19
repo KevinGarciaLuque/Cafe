@@ -8,15 +8,22 @@
   'use strict';
   var A = window.AUREO = window.AUREO || {};
 
-  /* Estas 5 cadenas deben ser identicas a las media queries de main.css */
-  var GATES = [
-    '(max-width: 720px)',
-    '(orientation: portrait) and (max-width: 1024px)',
-    '(orientation: portrait) and (pointer: coarse)',
-    '(orientation: landscape) and (pointer: coarse) and (max-height: 560px)',
+  /* Estas cadenas deben ser identicas a las media queries de main.css.
+     Estaticas: sin scrub, imagen diseñada. Moviles: scrub con el video vertical ligero. */
+  var STATIC_GATES = [
+    '(orientation: landscape) and (pointer: coarse) and (max-height: 560px)',   /* telefono en horizontal: no hay sitio para el recorrido */
     '(prefers-reduced-motion: reduce)'
   ];
+  var MOBILE_GATES = [
+    '(max-width: 720px)',
+    '(orientation: portrait) and (max-width: 1024px)',
+    '(orientation: portrait) and (pointer: coarse)'
+  ];
+  var GATES = STATIC_GATES.concat(MOBILE_GATES);
   var MQLS = GATES.map(function (q) { return window.matchMedia(q); });
+  var STATIC_MQLS = MQLS.slice(0, STATIC_GATES.length);
+  var MOBILE_MQLS = MQLS.slice(STATIC_GATES.length);
+  var forceStatic = false;   /* ahorro de datos, o el video no pudo cargarse en el movil */
   var STAGE_STARTS = [0, 0.207, 0.415, 0.605, 0.79];   /* inicio de cada clip dentro del video unido */
 
   var cfg = null;
@@ -33,11 +40,13 @@
   function clamp(v, lo, hi) { return Math.min(hi, Math.max(lo, v)); }
   function smooth(p, e0, e1) { var t = clamp((p - e0) / (e1 - e0), 0, 1); return t * t * (3 - 2 * t); }
   function $(id) { return document.getElementById(id); }
-  function gateActive() { return MQLS.some(function (m) { return m.matches; }); }
+  function isMobile() { return MOBILE_MQLS.some(function (m) { return m.matches; }); }
+  function saveData() { var c = navigator.connection; return !!(c && c.saveData); }
+  function gateActive() { return forceStatic || saveData() || STATIC_MQLS.some(function (m) { return m.matches; }); }
 
   function heroProgress() {
     var r = heroEl.getBoundingClientRect();
-    var range = heroEl.offsetHeight - window.innerHeight;
+    var range = heroEl.offsetHeight - stageEl.offsetHeight;   /* la altura del escenario (svh) no cambia cuando la barra del navegador se esconde */
     if (range <= 0) return 0;
     return clamp(-r.top / range, 0, 1);
   }
@@ -138,9 +147,21 @@
     stageEl.classList.add('video-failed');
     stageEl.classList.remove('video-ready');
     loaderEl.hidden = true;
+    /* en el movil, un hero sin video seria una pagina larga con una foto fija: se pasa al hero estatico diseñado */
+    if (isMobile()) {
+      forceStatic = true;
+      document.documentElement.classList.add('force-static');
+      disableScrub(); ensureStaticImage();
+    }
   }
-  function loadHeroBlob() {
-    var url = cfg.media.video, bytes = cfg.media.videoBytes || 0;
+  function mediaFor() {
+    var m = cfg.media;
+    if (isMobile() && m.videoMobile) return { video: m.videoMobile, bytes: m.videoMobileBytes || 0, poster: m.posterMobile || m.poster, mobile: true };
+    return { video: m.video, bytes: m.videoBytes || 0, poster: m.poster, mobile: false };
+  }
+  var loadedVariant = null;
+  function loadHeroBlob(media) {
+    var url = media.video, bytes = media.bytes;
     abortCtrl = new AbortController();
     var ctrl = abortCtrl;
     var watchdog = setTimeout(function () { ctrl.abort(); }, 20000);
@@ -163,9 +184,14 @@
         objectUrl = URL.createObjectURL(new Blob(chunks, { type: 'video/mp4' }));
         video.src = objectUrl;
         video.load();
+        /* si el navegador no llega a poder reproducir el video (algunos moviles), se pasa al respaldo en vez de quedar en blanco */
+        var giveUp = setTimeout(failVideo, 9000);
         video.addEventListener('canplay', function () {
+          clearTimeout(giveUp);
           loaderEl.hidden = true;
           stageEl.classList.add('video-ready');
+          /* iOS solo pinta el primer cuadro tras una reproduccion breve, silenciada: se pausa de inmediato */
+          if (media.mobile) { try { var pr = video.play(); if (pr && pr.then) pr.then(function () { video.pause(); requestSeek(heroProgress() * video.duration); }).catch(function () {}); } catch (e) {} }
           requestSeek(heroProgress() * video.duration);
         }, { once: true });
       });
@@ -174,13 +200,26 @@
   function initHeroOnce() {
     if (started) return;
     started = true;
+    var media = mediaFor();
+    loadedVariant = media.mobile;
     loaderEl.hidden = false;
-    posterEl.style.backgroundImage = "url('" + cfg.media.poster + "')";
-    var go = (function () { var d = false; return function () { if (d) return; d = true; loadHeroBlob().catch(failVideo); }; })();
+    posterEl.style.backgroundImage = "url('" + media.poster + "')";
+    var go = (function () { var d = false; return function () { if (d) return; d = true; loadHeroBlob(media).catch(failVideo); }; })();
     var img = new Image();
     img.onload = go; img.onerror = go;
-    img.src = cfg.media.poster;
+    img.src = media.poster;
     setTimeout(go, 4000);
+  }
+  /* al girar o redimensionar entre movil y escritorio se cambia a la version de video que corresponde */
+  function switchVariantIfNeeded() {
+    if (!started || forceStatic) return;
+    if (mediaFor().mobile === loadedVariant) return;
+    if (abortCtrl) abortCtrl.abort();
+    if (objectUrl) { URL.revokeObjectURL(objectUrl); objectUrl = null; }
+    video.removeAttribute('src'); video.load();
+    stageEl.classList.remove('video-ready', 'video-failed');
+    seekBusy = false; pendingTime = null; started = false;
+    if (scrubOn) initHeroOnce();
   }
 
   /* ---------- activar y desactivar el scrub ---------- */
@@ -211,7 +250,7 @@
   }
   function applyHeroMode() {
     if (gateActive()) { disableScrub(); ensureStaticImage(); }
-    else enableScrub();
+    else { enableScrub(); switchVariantIfNeeded(); }
   }
 
   function cleanup() {

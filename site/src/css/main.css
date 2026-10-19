@@ -156,14 +156,35 @@ main:focus{outline:none}
 .hero-static .copy{position:relative;width:100%;padding:0 var(--pad-x) clamp(56px,11svh,110px);text-shadow:var(--tshadow)}
 .hs-title{font:300 clamp(2.5rem,12vw,5rem)/1 var(--f-display);letter-spacing:.08em;margin-bottom:.35em}
 .hero-static .sub{font:400 1.1rem/1.55 var(--f-body);max-width:30ch;margin-bottom:1.8rem}
-@media (max-width:720px),
-       (orientation:portrait) and (max-width:1024px),
-       (orientation:portrait) and (pointer:coarse),
-       (orientation:landscape) and (pointer:coarse) and (max-height:560px),
+/* condiciones estaticas (iguales a STATIC_GATES en hero.js): telefono en horizontal y movimiento reducido */
+@media (orientation:landscape) and (pointer:coarse) and (max-height:560px),
        (prefers-reduced-motion:reduce){
   .hero-scrub{display:none}
   .hero-static{display:grid}
   .thread{display:none}
+}
+/* respaldo: ahorro de datos, o el video no pudo cargarse en el movil (lo activa hero.js) */
+html.force-static .hero-scrub{display:none}
+html.force-static .hero-static{display:grid}
+
+/* ---------- movil vertical: el scrub usa el video 4:5 ligero (iguales a MOBILE_GATES en hero.js) ---------- */
+@media (max-width:720px),
+       (orientation:portrait) and (max-width:1024px),
+       (orientation:portrait) and (pointer:coarse){
+  .hero-scrub{height:900vh;height:900svh}
+  .stage{background:var(--canvas)}
+  .poster,#heroVideo{inset:0 0 auto 0;height:min(125vw,68svh);-webkit-mask-image:linear-gradient(to bottom,#000 70%,transparent 100%);mask-image:linear-gradient(to bottom,#000 70%,transparent 100%)}
+  .scrim{display:none}
+  .stage-progress,.cue{display:none}
+  .loader{left:22px;bottom:auto;top:78px}
+  .band,.band.align-right{align-items:flex-end;justify-content:flex-start;padding:0 22px max(6svh,26px)}
+  .band .copy{max-width:100%}
+  .band::before,.final-wrap .band::before{inset:0;background:linear-gradient(to top,rgba(10,7,5,calc(.9*var(--sa,1))) 0%,rgba(10,7,5,calc(.62*var(--sa,1))) 42%,rgba(10,7,5,0) 82%)!important}
+  .hl{font-size:clamp(2rem,9.4vw,3.1rem);max-width:15ch;margin-bottom:.35em}
+  .band .sub{font-size:1rem;max-width:34ch}
+  .band.final .hl{font-size:clamp(2.2rem,10.5vw,3.4rem);max-width:none}
+  .band.final .cta-row{margin-top:1.2rem}
+  .band.final .btn{flex:1 1 auto}
 }
 
 /* ---------- secciones ---------- */

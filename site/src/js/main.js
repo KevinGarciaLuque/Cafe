@@ -48,7 +48,7 @@
         if (Math.abs(tp - lastTp) > 0.002) { lastTp = tp; document.documentElement.style.setProperty('--tp', tp.toFixed(4)); }
         /* sobre el hero la cabecera es transparente; se vuelve solida al terminar el recorrido */
         var hero = $('inicio');
-        var solid = (A.hero && A.hero.isScrub() && hero) ? y > hero.offsetHeight - window.innerHeight + 60 : y > 40;
+        var solid = (A.hero && A.hero.isScrub() && hero) ? y > hero.offsetHeight - $('stage').offsetHeight + 60 : y > 40;
         if (solid !== lastSolid) { lastSolid = solid; header.classList.toggle('scrolled', solid); }
       }
       window.addEventListener('scroll', function () { if (!ticking) { ticking = true; requestAnimationFrame(frame); } }, { passive: true });
