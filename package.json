@@ -1,0 +1,14 @@
+{
+  "name": "aureo-coffee",
+  "version": "1.0.0",
+  "description": "Web cinematografica de cafe con hero controlado por scroll",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node tools/serve.mjs site",
+    "dev": "node tools/serve.mjs site 8080"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

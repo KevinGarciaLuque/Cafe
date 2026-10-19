@@ -64,6 +64,19 @@ Actualiza `hero.media.videoBytes` y revisa los rangos de `hero.bands` (progreso 
 
 Escritorio: scrub completo. Teléfonos, tablets verticales, teléfonos en horizontal y usuarios con movimiento reducido: imagen estática diseñada, sin descargar video ni póster. Las 5 condiciones son idénticas en `main.css` y `hero.js` y se reevalúan en vivo al girar, redimensionar o cambiar la preferencia.
 
-## Publicar
+## Publicar en Railway
+
+El repositorio ya está listo: `package.json` define `npm start`, que sirve `site/` con `tools/serve.mjs`, escucha en el puerto que Railway asigna (`PORT`) y responde `/health`.
+
+1. En Railway: *New Project*, *Deploy from GitHub repo*, elegir este repositorio, rama `main`.
+2. No hace falta configurar nada más. Railway detecta Node y ejecuta `npm start`.
+3. En *Settings*, *Networking*, pulsar *Generate Domain* para obtener la dirección pública.
+4. Cada `git push` a `main` vuelve a desplegar.
+
+En producción el servidor **no sirve `/admin`** (no tiene inicio de sesión). Solo se habilita con la variable `ADMIN_ENABLED=1`, y no es recomendable sin proteger.
+
+Antes de compartir la dirección, reemplaza `og:image` y `og:url` en `site/index.html` (marcados con `DEPLOY STEP`) por la dirección pública absoluta y vuelve a subir.
+
+## Publicar en otro hosting
 
 Comprimir el contenido de `site/` (no la carpeta): `tools/package.ps1`. Antes de publicar, reemplaza `og:image` y `og:url` en `index.html` (marcados con `DEPLOY STEP`) por la dirección pública absoluta.
