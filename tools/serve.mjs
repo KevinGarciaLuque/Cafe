@@ -16,13 +16,19 @@ const types = {
   '.json': 'application/json; charset=utf-8', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png',
   '.webp': 'image/webp', '.svg': 'image/svg+xml', '.mp4': 'video/mp4', '.woff2': 'font/woff2', '.ico': 'image/x-icon'
 };
-// El contenido y las paginas se revalidan siempre; los archivos pesados se guardan un dia
-const cacheFor = (ext) => (['.html', '.json', '.js', '.css'].includes(ext) ? 'no-cache' : 'public, max-age=86400');
+// El contenido y las paginas se revalidan siempre. Los archivos con version en la direccion (?v=) se guardan un año;
+// el resto de imagenes y videos, solo una hora, para que un reemplazo llegue pronto a los visitantes.
+const cacheFor = (ext, versioned) => {
+  if (['.html', '.json', '.js', '.css'].includes(ext)) return 'no-cache';
+  return versioned ? 'public, max-age=31536000, immutable' : 'public, max-age=3600';
+};
 
 const server = http.createServer(async (req, res) => {
   try {
     if (req.method !== 'GET' && req.method !== 'HEAD') { res.writeHead(405, { Allow: 'GET, HEAD' }).end(); return; }
-    let path = decodeURIComponent(new URL(req.url, 'http://x').pathname);
+    const url = new URL(req.url, 'http://x');
+    const versioned = url.searchParams.has('v');
+    let path = decodeURIComponent(url.pathname);
     if (path === '/health') { res.writeHead(200, { 'Content-Type': 'text/plain' }).end('ok'); return; }
     if (!adminOn && (path === '/admin' || path.startsWith('/admin/'))) { res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' }).end('No encontrado'); return; }
     if (path.endsWith('/')) path += 'index.html';
@@ -34,7 +40,7 @@ const server = http.createServer(async (req, res) => {
     const headers = {
       'Content-Type': types[ext] || 'application/octet-stream',
       'Content-Length': info.size,
-      'Cache-Control': cacheFor(ext),
+      'Cache-Control': cacheFor(ext, versioned),
       'X-Content-Type-Options': 'nosniff',
       'Referrer-Policy': 'strict-origin-when-cross-origin'
     };

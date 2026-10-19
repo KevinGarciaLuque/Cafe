@@ -58,7 +58,7 @@ El recorrido se construyó con 5 clips encadenados (Kling v3.0 pro, desde Higgsf
 ffmpeg -i nuevo.mp4 -c:v libx264 -crf 22 -preset slow -g 8 -keyint_min 8 -pix_fmt yuv420p -movflags +faststart -an site/assets/video/hero-scrub.mp4
 ```
 
-Actualiza `hero.media.videoBytes` y revisa los rangos de `hero.bands` (progreso de scroll de 0 a 1). Los tiempos de cada clip dentro del video están en `STAGE_STARTS` de `src/js/hero.js`.
+Actualiza `hero.media.videoBytes` (o `videoMobileBytes`): ese número se añade a la dirección del video como `?v=`, y así los navegadores no sirven la copia vieja de su caché. Revisa también los rangos de `hero.bands` (progreso de scroll de 0 a 1). Los tiempos de cada clip dentro del video están en `STAGE_STARTS` de `src/js/hero.js`.
 
 ## Comportamiento por dispositivo
 

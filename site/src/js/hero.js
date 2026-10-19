@@ -27,7 +27,7 @@
   var STAGE_STARTS = [0, 0.204, 0.408, 0.602, 0.796];   /* inicio de cada clip dentro del video unido */
 
   var cfg = null;
-  var heroEl, stageEl, video, posterEl, loaderEl, ringEl, cueEl, staticEl, progEl;
+  var heroEl, stageEl, video, posterEl, loaderEl, ringEl, cueEl, staticEl, progEl, labelEl;
   var bands = [], stageItems = [], finalWrap = null;
   var target = 0, shown = 0, rafId = null, lastTick = 0;
   var heroOnScreen = true, io = null;
@@ -123,8 +123,15 @@
     requestSeek(shown * (video.duration || 0));
     updateCaptions(shown);
   }
+  /* mientras el video baja, el recorrido espera en el inicio: los textos no avanzan sobre un video congelado */
+  function videoSettled() { return stageEl.classList.contains('video-ready') || stageEl.classList.contains('video-failed'); }
+  function syncNow() {
+    target = shown = videoSettled() ? heroProgress() : 0;
+    updateCaptions(shown);
+    if (video.duration && videoSettled()) requestSeek(shown * video.duration);
+  }
   function onScroll() {
-    target = heroProgress();
+    target = videoSettled() ? heroProgress() : 0;
     if (rafId === null && heroOnScreen) rafId = requestAnimationFrame(tick);
   }
 
@@ -142,11 +149,17 @@
   }
 
   /* ---------- carga del video: Blob en streaming ---------- */
-  function setRing(frac) { ringEl.style.setProperty('--ld', Math.round(126 * (1 - frac))); }
+  var lastPct = -1;
+  function setRing(frac) {
+    ringEl.style.setProperty('--ld', Math.round(126 * (1 - frac)));
+    var pct = Math.round(frac * 100);
+    if (pct !== lastPct) { lastPct = pct; labelEl.textContent = (cfg.loadingLabel || '') + ' ' + pct + ' %'; }
+  }
   function failVideo() {
     stageEl.classList.add('video-failed');
     stageEl.classList.remove('video-ready');
     loaderEl.hidden = true;
+    if (scrubOn) syncNow();
     /* en el movil, un hero sin video seria una pagina larga con una foto fija: se pasa al hero estatico diseñado */
     if (isMobile()) {
       forceStatic = true;
@@ -161,7 +174,9 @@
   }
   var loadedVariant = null;
   function loadHeroBlob(media) {
-    var url = media.video, bytes = media.bytes;
+    var bytes = media.bytes;
+    /* el tamaño va en la direccion: si se reemplaza el video, el navegador no sirve la copia vieja de su cache */
+    var url = media.video + (bytes ? (media.video.indexOf('?') > -1 ? '&' : '?') + 'v=' + bytes : '');
     abortCtrl = new AbortController();
     var ctrl = abortCtrl;
     var watchdog = setTimeout(function () { ctrl.abort(); }, 20000);
@@ -191,8 +206,8 @@
           loaderEl.hidden = true;
           stageEl.classList.add('video-ready');
           /* iOS solo pinta el primer cuadro tras una reproduccion breve, silenciada: se pausa de inmediato */
-          if (media.mobile) { try { var pr = video.play(); if (pr && pr.then) pr.then(function () { video.pause(); requestSeek(heroProgress() * video.duration); }).catch(function () {}); } catch (e) {} }
-          requestSeek(heroProgress() * video.duration);
+          if (media.mobile) { try { var pr = video.play(); if (pr && pr.then) pr.then(function () { video.pause(); syncNow(); }).catch(function () {}); } catch (e) {} }
+          syncNow();   /* salta de una vez al punto del recorrido donde esta el visitante */
         }, { once: true });
       });
     }).catch(function (err) { clearTimeout(watchdog); throw err; });
@@ -225,14 +240,13 @@
   /* ---------- activar y desactivar el scrub ---------- */
   function resetCaches() { bands.forEach(function (b) { b.op = -1; b.k = -1; b.live = null; }); lastStage = -1; lastSp = -1; }
   function enableScrub() {
-    if (scrubOn) { resetCaches(); target = shown = heroProgress(); updateCaptions(shown); return; }
+    if (scrubOn) { resetCaches(); syncNow(); return; }
     scrubOn = true;
     initHeroOnce();
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll, { passive: true });
     resetCaches();
-    target = shown = heroProgress();
-    updateCaptions(shown);
+    syncNow();
     startLoadRamp();
     onScroll();
   }
@@ -264,7 +278,7 @@
   function setup(C) {
     cfg = C.hero;
     heroEl = $('inicio'); stageEl = $('stage'); video = $('heroVideo'); posterEl = $('poster');
-    loaderEl = $('heroLoader'); ringEl = loaderEl.querySelector('.ring'); cueEl = $('scrollCue');
+    loaderEl = $('heroLoader'); ringEl = loaderEl.querySelector('.ring'); cueEl = $('scrollCue'); labelEl = $('loaderLabel'); lastPct = -1;
     staticEl = $('heroStatic'); progEl = $('stageProgress');
     collect();
     if (!wired) {
