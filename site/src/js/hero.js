@@ -24,7 +24,7 @@
   var STATIC_MQLS = MQLS.slice(0, STATIC_GATES.length);
   var MOBILE_MQLS = MQLS.slice(STATIC_GATES.length);
   var forceStatic = false;   /* ahorro de datos, o el video no pudo cargarse en el movil */
-  var STAGE_STARTS = [0, 0.207, 0.415, 0.605, 0.79];   /* inicio de cada clip dentro del video unido */
+  var STAGE_STARTS = [0, 0.204, 0.408, 0.602, 0.796];   /* inicio de cada clip dentro del video unido */
 
   var cfg = null;
   var heroEl, stageEl, video, posterEl, loaderEl, ringEl, cueEl, staticEl, progEl;
